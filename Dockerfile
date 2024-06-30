@@ -1,6 +1,9 @@
 # Use an official Python runtime as a parent image
 FROM python:3.9-slim
 
+# Install necessary packages
+RUN apt-get update && apt-get install -y iproute2 curl && apt-get clean
+
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
