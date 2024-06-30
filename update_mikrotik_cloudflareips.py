@@ -14,6 +14,8 @@ password = os.getenv('PASSWORD')
 username = os.getenv('USERNAME', 'admin')
 check_interval = int(os.getenv('CHECK_INTERVAL', 3600))  # Check every hour by default
 ifname = os.getenv('IFNAME')
+ifListName = os.getenv('IF_LIST_NAME', 'proxyv6')
+updateCloudflare = os.getenv('UPDATE_CLOUDFLARE', 'true').lower() == 'true'
 
 def get_ipv6_address(ifname='eth0'):
     # Sanitize the input, no non-interface names allowed
@@ -81,36 +83,56 @@ def update_v6_address_list(api, list_name, new_addresses):
 
 def main():
     api = connect_to_router()
+    if api is None:
+        print("Failed to connect to the router")
+        return 1
+    
+    enabled = False
+
+    if updateCloudflare:
+        print("Cloudflare address lists update enabled")
+        enabled = True
+    else:
+        print("Cloudflare address list update disabled")
+
+    if ifname is not None and ifname != "":
+        print(f"Interface address list update enabled for {ifname}")
+        enabled = True
+    else:
+        print("Interface address list update disabled")
+
+    if not enabled:
+        print("No address list update enabled. Exiting")
+        return 1
+
     cached_ipv6, cached_ipv4 = {}, {}
     cached_interface_ipv6 = ""
 
     while True:
         try:
-            current_ipv6, current_ipv4 = fetch_cloudflare_ips()
-            print(f"IPv6: {current_ipv6}, IPv4: {current_ipv4}")
+            if updateCloudflare:
+                current_ipv6, current_ipv4 = fetch_cloudflare_ips()
+                print(f"IPv6: {current_ipv6}, IPv4: {current_ipv4}")
 
-            if current_ipv6 != cached_ipv6:
-                update_v6_address_list(api, 'cloudflarev6', current_ipv6)
-                cached_ipv6 = current_ipv6
+                if current_ipv6 != cached_ipv6:
+                    update_v6_address_list(api, 'cloudflarev6', current_ipv6)
+                    cached_ipv6 = current_ipv6
 
-            if current_ipv4 != cached_ipv4:
-                update_v4_address_list(api, 'cloudflarev4', current_ipv4)
-                cached_ipv4 = current_ipv4
+                if current_ipv4 != cached_ipv4:
+                    update_v4_address_list(api, 'cloudflarev4', current_ipv4)
+                    cached_ipv4 = current_ipv4
 
-            if ifname is None or ifname == "":
-                print("No IFNAME. Skipping proxyv6 address list update")
-                continue
+            if ifname is not None and ifname != "":
+                # Update the IPv6 address in the interface list
+                interface_ipv6 = get_ipv6_address()
+                if interface_ipv6:
+                    print(f"Interface IPv6: {interface_ipv6}")
+                else:
+                    print("No IFNAME. Skipping proxyv6 address list update")
 
-            # Update the IPv6 address in the interface list
-            interface_ipv6 = get_ipv6_address()
-            if interface_ipv6:
-                print(f"Interface IPv6: {interface_ipv6}")
-            else:
-                print("No IFNAME. Skipping proxyv6 address list update")
-
-            if interface_ipv6 and interface_ipv6 != cached_interface_ipv6:
-                update_v6_address_list(api, 'proxyv6', {interface_ipv6})
-                cached_interface_ipv6 = interface_ipv6
+                if interface_ipv6 and interface_ipv6 != cached_interface_ipv6:
+                    update_v6_address_list(api, 'proxyv6', {interface_ipv6})
+                    cached_interface_ipv6 = interface_ipv6
 
         except Exception as e:
             print(f"An error occurred: {e}")

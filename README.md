@@ -12,6 +12,8 @@ This Dockerized solution periodically updates two address lists on a MikroTik ro
   - `PASSWORD`: Password for MikroTik API access.
   - `USERNAME`: MikroTik router username.
   - `IFNAME`: Name of the local interface whose IPv6 address should be added to `proxyv6`. leave empty disables updating the proxyv6 list
+  - `IF_LIST_NAME`: The Address List Name to update the interface IPv6 addresses to. Default `proxyv6`
+  - `UPDATE_CLOUDFLARE`: Whether or not to update the CloudFlare IP list to Mikrotik router. Default `true`. Disable by setting to anything other than `true`
 
 ## Usage
 
@@ -33,6 +35,8 @@ This Dockerized solution periodically updates two address lists on a MikroTik ro
    PASSWORD=YOUR_API_TOKEN
    USERNAME=your-username
    IFNAME=eth0
+   IF_LIST_NAME=proxyv6
+   UPDATE_CLOUDFLARE=true
    ```
 
    Replace `ROUTER_IP`, `PASSWORD`, `USERNAME`, and `IFNAME` with your actual values.
