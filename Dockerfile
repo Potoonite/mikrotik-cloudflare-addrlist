@@ -14,5 +14,7 @@ COPY ./update_mikrotik_cloudflareips.py .
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+ENV PYTHONUNBUFFERED=1
+
 # Run update_mikrotik.py when the container launches
-CMD ["python", "./update_mikrotik_cloudflareips.py"]
+CMD ["python", "-u", "./update_mikrotik_cloudflareips.py"]
