@@ -6,7 +6,7 @@ This Dockerized solution periodically updates two address lists on a MikroTik ro
 
 - Docker
 - Docker Compose
-- MikroTik router with API access enabled
+- MikroTik router with API access enabled. User group permission `read, write, policy, api, restapi`.
 - Environment variables for configuration:
   - `ROUTER_IP`: IP address of the MikroTik router.
   - `PASSWORD`: Password for MikroTik API access.
@@ -20,8 +20,8 @@ This Dockerized solution periodically updates two address lists on a MikroTik ro
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/potoonite/cloudflare-mikrotik-addrlist.git
-   cd cloudflare-mikrotik-addrlist
+   git clone https://github.com/potoonite/mikrotik-cloudflare-addrlist.git
+   cd mikrotik-cloudflare-addrlist
    ```
 
 2. **Set Environment Variables:**
