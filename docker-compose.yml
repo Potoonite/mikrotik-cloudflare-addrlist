@@ -7,4 +7,5 @@ services:
       - API_TOKEN=${API_TOKEN}
       - USERNAME=${USERNAME}
       - IFNAME=${IFNAME}
+    network_mode: 'host'
     restart: unless-stopped

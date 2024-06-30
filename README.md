@@ -45,17 +45,19 @@ This Dockerized solution periodically updates two address lists on a MikroTik ro
 
 4. **Run the Docker:**
 
+   Note, you need to run on the host's networking stack with option `--network host` for interface IPv6 detection to work.
+
    **with .env**
 
    ```bash
-   docker run -d --env-file ./.env --name mikrotik-cloudflare-addrlist mikrotik-cloudflare-addrlist
+   docker run -d --network host --env-file ./.env --name mikrotik-cloudflare-addrlist mikrotik-cloudflare-addrlist
    ```
 
 
    **without .env**
 
     ```bash
-    docker run -d --name mikrotik-cloudflare-addrlist \
+    docker run -d --network host --name mikrotik-cloudflare-addrlist \
     -e ROUTER_IP='192.168.88.1' \
     -e PASSWORD='YOUR_PASSWORD_HERE' \
     -e USERNAME='your-username' \
