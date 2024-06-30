@@ -37,13 +37,30 @@ This Dockerized solution periodically updates two address lists on a MikroTik ro
 
    Replace `ROUTER_IP`, `PASSWORD`, `USERNAME`, and `IFNAME` with your actual values.
 
-3. **Run Docker Compose:**
+3. **Build the Docker Image:**
+
+   ```bash
+   docker build -t update-cloudflare-mikrotik .
+   ```
+
+4. **Run the Docker:**
+
+    ```bash
+    docker run -d --name update-cloudflare-mikrotik \
+    -e ROUTER_IP='192.168.88.1' \
+    -e PASSWORD='YOUR_PASSWORD_HERE' \
+    -e USERNAME='your-username' \
+    -e IFNAME='eth0' \
+    update-cloudflare-mikrotik
+    ```
+
+5. **Run Docker Compose:**
 
    ```bash
    docker-compose up -d
    ```
 
-4. **Verify Container Logs:**
+6. **Verify Container Logs:**
 
    ```bash
    docker-compose logs -f
