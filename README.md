@@ -57,8 +57,8 @@ This Dockerized solution periodically updates two address lists on a MikroTik ro
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/potoonite/cloudflare-mikrotik-docker.git
-   cd cloudflare-mikrotik-docker
+   git clone https://github.com/potoonite/cloudflare-mikrotik-addrlist.git
+   cd cloudflare-mikrotik-addrlist
    ```
 
 2. **Set Environment Variables:**
