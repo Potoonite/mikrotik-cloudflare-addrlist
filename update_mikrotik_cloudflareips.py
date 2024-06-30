@@ -13,7 +13,7 @@ router_ip = os.getenv('ROUTER_IP', '192.168.88.1')
 password = os.getenv('PASSWORD')
 username = os.getenv('USERNAME', 'admin')
 check_interval = int(os.getenv('CHECK_INTERVAL', 3600))  # Check every hour by default
-ifname = os.getenv('IFNAME', 'eth0')
+ifname = os.getenv('IFNAME')
 
 def get_ipv6_address(ifname='eth0'):
     # Sanitize the input, no non-interface names allowed
@@ -99,7 +99,11 @@ def main():
 
             # Update the IPv6 address in the interface list
             interface_ipv6 = get_ipv6_address()
-            print(f"Interface IPv6: {interface_ipv6}")
+            if interface_ipv6:
+                print(f"Interface IPv6: {interface_ipv6}")
+            else:
+                print("No IFNAME. Skipping proxyv6 address list update")
+
             if interface_ipv6 and interface_ipv6 != cached_interface_ipv6:
                 update_v6_address_list(api, 'proxyv6', {interface_ipv6})
                 cached_interface_ipv6 = interface_ipv6

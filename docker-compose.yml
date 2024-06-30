@@ -1,0 +1,10 @@
+version: '3'
+services:
+  cloudflare-mikrotik:
+    build: .
+    environment:
+      - ROUTER_IP=${ROUTER_IP}
+      - API_TOKEN=${API_TOKEN}
+      - USERNAME=${USERNAME}
+      - IFNAME=${IFNAME}
+    restart: unless-stopped
