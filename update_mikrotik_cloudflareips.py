@@ -97,6 +97,10 @@ def main():
                 update_v4_address_list(api, 'cloudflarev4', current_ipv4)
                 cached_ipv4 = current_ipv4
 
+            if ifname is None or ifname == "":
+                print("No IFNAME. Skipping proxyv6 address list update")
+                continue
+
             # Update the IPv6 address in the interface list
             interface_ipv6 = get_ipv6_address()
             if interface_ipv6:
