@@ -67,6 +67,12 @@ This Dockerized solution periodically updates two address lists on a MikroTik ro
 
 5. **Run Docker Compose:**
 
+   A sample docker-compose.yml is included in this repository. Note the image line and the env_file line.
+   
+   If you have prebuild the docker image, use the image name, otherwise leave it as `.`.
+   
+   If you are including this service in another docker-compose file, update the path to the .env file.
+
    ```bash
    docker-compose up -d
    ```
