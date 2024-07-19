@@ -16,6 +16,8 @@ check_interval = int(os.getenv('CHECK_INTERVAL', 3600))  # Check every hour by d
 ifname = os.getenv('IFNAME')
 ifListName = os.getenv('IF_LIST_NAME', 'proxyv6')
 updateCloudflare = os.getenv('UPDATE_CLOUDFLARE', 'true').lower() == 'true'
+# a comma separated list of hostnames to set Mikrotik AAAA Static DNS
+v6dnsList = os.getenv('V6DNS_LIST', '')
 
 def get_ipv6_address(ifname='eth0'):
     # Sanitize the input, no non-interface names allowed
@@ -80,6 +82,22 @@ def update_v6_address_list(api, list_name, new_addresses):
     address_list = api.path('ipv6', 'firewall', 'address-list')
     update_address_list(api, address_list, list_name, new_addresses)
 
+# Given a list of hostnames, set the AAAA static DNS entries in Mikrotik
+def update_v6_dns(api, v6dnsList):
+    print(f"Updating AAAA static DNS entries: {v6dnsList}")
+    dns = api.path('ip', 'dns')
+    dnsList = set(dns.select('.id', 'name', 'address').where({'type': 'AAAA'}))
+    for entry in v6dnsList.split(','):
+        if entry == '':
+            continue
+        hostname, address = entry.split(':')
+        existing_entry = next((item for item in dnsList if item['name'] == hostname), None)
+        if existing_entry:
+            print(f"Updating existing DNS entry for {hostname}")
+            dns.update(id=existing_entry['.id'], address=address)
+        else:
+            print(f"Adding new DNS entry for {hostname}")
+            dns.add(name=hostname, address=address, type='AAAA')
 
 def main():
     api = connect_to_router()
@@ -132,6 +150,8 @@ def main():
 
                 if interface_ipv6 and interface_ipv6 != cached_interface_ipv6:
                     update_v6_address_list(api, 'proxyv6', {interface_ipv6})
+                    if v6dnsList:
+                        update_v6_dns(api, v6dnsList)
                     cached_interface_ipv6 = interface_ipv6
 
         except Exception as e:
