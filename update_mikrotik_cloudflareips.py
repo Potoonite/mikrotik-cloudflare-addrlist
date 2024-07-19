@@ -85,18 +85,17 @@ def update_v6_address_list(api, list_name, new_addresses):
 # Given a list of hostnames, set the AAAA static DNS entries in Mikrotik
 def update_v6_dns(api, v6dnsList, new_address):
     print(f"Updating AAAA static DNS entries: {v6dnsList}")
-    dns = api.path('ip', 'dns')
-    dnsList = set(dns.select('.id', 'name', 'address').where({'type': 'AAAA'}))
+    dns = api.path('ip', 'dns', 'static')
+    dnsList = dns.select('.id', 'name', 'address', 'type').where({'type': 'AAAA'})
     for entry in v6dnsList.split(','):
         if entry == '':
             continue
-        existing_entry = next((item for item in dnsList if item['name'] == entry), None)
+        existing_entry = next((item for item in dnsList if item.get('name') == entry and item.get('type') == 'AAAA'), None)
         if existing_entry:
-            print(f"Updating existing DNS entry for {entry}")
-            dns.update(id=existing_entry.get('.id'), address=new_address)
-        else:
-            print(f"Adding new DNS entry for {entry}")
-            dns.add(name=entry, address=new_address, type='AAAA')
+            print(f"Removing existing DNS entry for {entry}")
+            dns.remove(existing_entry.get('.id'))
+        print(f"Adding new DNS entry for {entry}")
+        dns.add(name=entry, address=new_address, type='AAAA')
 
 def main():
     api = connect_to_router()
