@@ -14,6 +14,7 @@ This Dockerized solution periodically updates two address lists on a MikroTik ro
   - `IFNAME`: Name of the local interface whose IPv6 address should be added to `proxyv6`. leave empty disables updating the proxyv6 list
   - `IF_LIST_NAME`: The Address List Name to update the interface IPv6 addresses to. Default `proxyv6`
   - `UPDATE_CLOUDFLARE`: Whether or not to update the CloudFlare IP list to Mikrotik router. Default `true`. Disable by setting to anything other than `true`
+  - `V6DNS_LIST`: A comma separated list of hostnames to set Static IPv6 DNS (AAAA) to the local DNS server.
 
 ## Usage
 
