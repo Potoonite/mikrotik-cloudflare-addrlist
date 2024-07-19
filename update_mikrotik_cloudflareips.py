@@ -66,7 +66,7 @@ def update_address_list(api, address_list, list_name, new_addresses):
     for item in address_list.select('.id', 'list', 'address').where({'list': list_name}):
         if item.get('list') == list_name and item['address'] not in new_addresses:
             print(f"Removing {item['address']} from {list_name}")
-            address_list.remove(id=item['id'])
+            address_list.remove(item.get('.id'))
 
     # Add new entries
     existing_addresses = get_existing_address_list(address_list, list_name)
@@ -83,21 +83,20 @@ def update_v6_address_list(api, list_name, new_addresses):
     update_address_list(api, address_list, list_name, new_addresses)
 
 # Given a list of hostnames, set the AAAA static DNS entries in Mikrotik
-def update_v6_dns(api, v6dnsList):
+def update_v6_dns(api, v6dnsList, new_address):
     print(f"Updating AAAA static DNS entries: {v6dnsList}")
     dns = api.path('ip', 'dns')
     dnsList = set(dns.select('.id', 'name', 'address').where({'type': 'AAAA'}))
     for entry in v6dnsList.split(','):
         if entry == '':
             continue
-        hostname, address = entry.split(':')
-        existing_entry = next((item for item in dnsList if item['name'] == hostname), None)
+        existing_entry = next((item for item in dnsList if item['name'] == entry), None)
         if existing_entry:
-            print(f"Updating existing DNS entry for {hostname}")
-            dns.update(id=existing_entry['.id'], address=address)
+            print(f"Updating existing DNS entry for {entry}")
+            dns.update(id=existing_entry.get('.id'), address=new_address)
         else:
-            print(f"Adding new DNS entry for {hostname}")
-            dns.add(name=hostname, address=address, type='AAAA')
+            print(f"Adding new DNS entry for {entry}")
+            dns.add(name=entry, address=new_address, type='AAAA')
 
 def main():
     api = connect_to_router()
@@ -150,8 +149,8 @@ def main():
 
                 if interface_ipv6 and interface_ipv6 != cached_interface_ipv6:
                     update_v6_address_list(api, 'proxyv6', {interface_ipv6})
-                    if v6dnsList:
-                        update_v6_dns(api, v6dnsList)
+                    if v6dnsList != '':
+                        update_v6_dns(api, v6dnsList, interface_ipv6)
                     cached_interface_ipv6 = interface_ipv6
 
         except Exception as e:
